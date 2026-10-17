@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Barbershop – Chisinau</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="page">
+
+  <div class="page__stripe"></div>
+
+  <header class="header">
+    <div class="header__inner">
+      <a class="header__logo" href="index.html">Your <span class="header__logo-accent">Barbershop</span></a>
+      <button class="header__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+      </button>
+      <nav class="header__nav" id="menu">
+        <a class="header__link" href="index.html#services">Services</a>
+        <a class="header__link" href="index.html#why-us">Why us</a>
+        <a class="header__link" href="index.html#hours">Hours</a>
+        <a class="header__link" href="index.html#contact">Contact</a>
+        <a class="btn btn--primary" href="pages/booking.html">Book now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero__inner">
+        <div class="hero__content">
+          <p class="status" data-status>Checking opening hours...</p>
+          <p class="hero__eyebrow">Classic barbershop · Chisinau</p>
+          <h1 class="hero__title">A haircut that holds its shape.</h1>
+          <p class="hero__text">Haircuts, beard trims and straight-razor shaves in a calm atmosphere. You pick the time, we take care of the rest.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="booking.html">Book now</a>
+            <a class="btn btn--outline" href="#services">See services</a>
+          </div>
+        </div>
+        <div class="hero__photo">[SHOP PHOTO]</div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="services">
+      <div class="section__inner">
+        <h2 class="section__title">Services</h2>
+        <div class="price-list">
+          <div class="price-list__item">
+            <div class="price-list__info">
+              <h3 class="price-list__name">Classic haircut</h3>
+              <p class="price-list__description">Scissor or clipper cut, wash and styling.</p>
+            </div>
+            <p class="price-list__duration">45 min</p>
+            <p class="price-list__price">200 MDL</p>
+            <a class="btn btn--outline btn--small price-list__button" href="pages/booking.html?service=Classic%20haircut">Book</a>
+          </div>
+          <div class="price-list__item">
+            <div class="price-list__info">
+              <h3 class="price-list__name">Kids haircut</h3>
+              <p class="price-list__description">For boys under 12, quick and patient.</p>
+            </div>
+            <p class="price-list__duration">30 min</p>
+            <p class="price-list__price">150 MDL</p>
+            <a class="btn btn--outline btn--small price-list__button" href="pages/booking.html?service=Kids%20haircut">Book</a>
+          </div>
+          <div class="price-list__item">
+            <div class="price-list__info">
+              <h3 class="price-list__name">Beard trim</h3>
+              <p class="price-list__description">Shaping, line-up and beard oil finish.</p>
+            </div>
+            <p class="price-list__duration">30 min</p>
+            <p class="price-list__price">150 MDL</p>
+            <a class="btn btn--outline btn--small price-list__button" href="pages/booking.html?service=Beard%20trim">Book</a>
+          </div>
+          <div class="price-list__item">
+            <div class="price-list__info">
+              <h3 class="price-list__name">Hot towel shave</h3>
+              <p class="price-list__description">Straight-razor shave with a hot towel and aftershave balm.</p>
+            </div>
+            <p class="price-list__duration">40 min</p>
+            <p class="price-list__price">180 MDL</p>
+            <a class="btn btn--outline btn--small price-list__button" href="pages/booking.html?service=Hot%20towel%20shave">Book</a>
+          </div>
+          <div class="price-list__item">
+            <div class="price-list__info">
+              <h3 class="price-list__name">Haircut and beard <span class="price-list__badge">Most popular</span></h3>
+              <p class="price-list__description">The full package: haircut, beard trim and styling in one visit.</p>
+            </div>
+            <p class="price-list__duration">75 min</p>
+            <p class="price-list__price">320 MDL</p>
+            <a class="btn btn--primary btn--small price-list__button" href="pages/booking.html?service=Haircut%20and%20beard">Book</a>
+          </div>
+        </div>
+        <p class="services__note">Prices are in MDL. Duration is approximate.</p>
+      </div>
+    </section>
+
+    <section class="section" id="why-us">
+      <div class="section__inner">
+        <h2 class="section__title">Why us</h2>
+        <div class="features__grid">
+          <div class="feature">
+            <p class="feature__number">01</p>
+            <h3 class="feature__title">Booked at a fixed time</h3>
+            <p class="feature__text">Come at your time, no waiting in line.</p>
+          </div>
+          <div class="feature">
+            <p class="feature__number">02</p>
+            <h3 class="feature__title">Attention to detail</h3>
+            <p class="feature__text">Every cut is planned around your face shape and your style.</p>
+          </div>
+          <div class="feature">
+            <p class="feature__number">03</p>
+            <h3 class="feature__title">Relaxed atmosphere</h3>
+            <p class="feature__text">A place where you sit back in the chair and slow down for an hour.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="hours">
+      <div class="section__inner contact__grid">
+        <div class="hours">
+          <h2 class="section__title">Opening hours</h2>
+          <p class="status" data-status>Checking opening hours...</p>
+          <div class="hours__row"><span class="hours__day">Monday</span><span class="hours__time" data-day="1"></span></div>
+          <div class="hours__row"><span class="hours__day">Tuesday</span><span class="hours__time" data-day="2"></span></div>
+          <div class="hours__row"><span class="hours__day">Wednesday</span><span class="hours__time" data-day="3"></span></div>
+          <div class="hours__row"><span class="hours__day">Thursday</span><span class="hours__time" data-day="4"></span></div>
+          <div class="hours__row"><span class="hours__day">Friday</span><span class="hours__time" data-day="5"></span></div>
+          <div class="hours__row"><span class="hours__day">Saturday</span><span class="hours__time" data-day="6"></span></div>
+          <div class="hours__row"><span class="hours__day">Sunday</span><span class="hours__time" data-day="0"></span></div>
+          <p class="hours__note">All times are Chisinau time.</p>
+        </div>
+        <div class="contact" id="contact">
+          <h2 class="section__title">Contact</h2>
+          <ul class="contact__list">
+            <li class="contact__item"><span class="contact__label">Address</span><span class="contact__value">Stefan cel Mare Blvd 100, Chisinau</span></li>
+            <li class="contact__item"><span class="contact__label">Phone</span><a class="contact__link" href="tel:123456789">123456789</a></li>
+            <li class="contact__item"><span class="contact__label">Email</span><a class="contact__link" href="mailto:info@yourbarbershop.md">info@yourbarbershop.md</a></li>
+            <li class="contact__item"><span class="contact__label">Instagram</span><a class="contact__link" href="https://instagram.com/yourbarbershop" target="_blank" rel="noopener">@yourbarbershop</a></li>
+          </ul>
+          <div class="quick">
+            <a class="quick__link" href="tel:123456789">Call</a>
+            <a class="quick__link" href="https://wa.me/123456789" target="_blank" rel="noopener">WhatsApp</a>
+            <a class="quick__link" href="https://t.me/+123456789" target="_blank" rel="noopener">Telegram</a>
+          </div>
+          <a class="btn btn--primary contact__button" href="pages/booking.html">Book online</a>
+          <iframe class="contact__map" title="Map" src="https://www.google.com/maps?q=Stefan+cel+Mare+Blvd+100,+Chisinau&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <span>© Your Barbershop</span>
+      <span>[INSTAGRAM] · [FACEBOOK]</span>
+    </div>
+  </footer>
+
+  <div class="quick-bar">
+    <a class="quick-bar__link" href="tel:123456789">Call</a>
+    <a class="quick-bar__link" href="https://wa.me/123456789" target="_blank" rel="noopener">WhatsApp</a>
+    <a class="quick-bar__link" href="https://t.me/+123456789" target="_blank" rel="noopener">Telegram</a>
+  </div>
+
+  <script src="assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Online booking – Your Barbershop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="page">
+
+  <div class="page__stripe"></div>
+
+  <header class="header">
+    <div class="header__inner">
+      <a class="header__logo" href="index.html">Your <span class="header__logo-accent">Barbershop</span></a>
+      <button class="header__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+      </button>
+      <nav class="header__nav" id="menu">
+        <a class="header__link" href="index.html#services">Services</a>
+        <a class="header__link" href="index.html#why-us">Why us</a>
+        <a class="header__link" href="index.html#hours">Hours</a>
+        <a class="header__link" href="index.html#contact">Contact</a>
+        <a class="btn btn--primary" href="booking.html">Book now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="booking">
+    <div class="booking__inner">
+      <h1 class="booking__title">Online booking</h1>
+      <p class="status" data-status>Checking opening hours...</p>
+
+      <form class="form" id="booking-form" novalidate>
+        <div class="form__field">
+          <label class="form__label" for="name">Name</label>
+          <input class="form__input" type="text" id="name" name="name" autocomplete="name" placeholder="Your name">
+          <p class="form__error" data-error="name"></p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="phone">Phone</label>
+          <input class="form__input" type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+373 ...">
+          <p class="form__error" data-error="phone"></p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="service">Service</label>
+          <select class="form__input" id="service" name="service">
+            <option value="">Choose a service</option>
+            <option value="Classic haircut">Classic haircut · 200 MDL</option>
+            <option value="Kids haircut">Kids haircut · 150 MDL</option>
+            <option value="Beard trim">Beard trim · 150 MDL</option>
+            <option value="Hot towel shave">Hot towel shave · 180 MDL</option>
+            <option value="Haircut and beard">Haircut and beard · 320 MDL</option>
+          </select>
+          <p class="form__error" data-error="service"></p>
+        </div>
+
+        <div class="form__row">
+          <div class="form__field">
+            <label class="form__label" for="date">Date</label>
+            <input class="form__input" type="date" id="date" name="date">
+            <p class="form__error" data-error="date"></p>
+          </div>
+          <div class="form__field">
+            <label class="form__label" for="time">Time</label>
+            <select class="form__input" id="time" name="time" disabled>
+              <option value="">Choose a date first</option>
+            </select>
+            <p class="form__error" data-error="time"></p>
+          </div>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="comment">Comment (optional)</label>
+          <textarea class="form__input form__input--textarea" id="comment" name="comment" rows="3"></textarea>
+        </div>
+
+        <button class="btn btn--primary form__submit" type="submit">Send booking</button>
+        <p class="form__message" id="form-message" role="status"></p>
+      </form>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <span>© Your Barbershop</span>
+      <span>[INSTAGRAM] · [FACEBOOK]</span>
+    </div>
+  </footer>
+
+  <div class="quick-bar">
+    <a class="quick-bar__link" href="tel:123456789">Call</a>
+    <a class="quick-bar__link" href="https://wa.me/123456789" target="_blank" rel="noopener">WhatsApp</a>
+    <a class="quick-bar__link" href="https://t.me/+123456789" target="_blank" rel="noopener">Telegram</a>
+  </div>
+
+  <script src="../assets/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reception – Your Barbershop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="page">
+
+  <div class="page__stripe"></div>
+
+  <header class="admin__bar">
+    <h1 class="admin__title">Reception</h1>
+    <div class="admin__tools">
+      <span class="admin__live" id="live-status">Loading...</span>
+      <button class="admin__button" type="button" id="sound-toggle">Turn sound on</button>
+      <a class="admin__button" href="../index.html">View site</a>
+      <button class="admin__button" type="button" id="logout">Log out</button>
+    </div>
+  </header>
+
+  <div class="admin__banner" id="banner">
+    <span id="banner-text"></span>
+    <button class="admin__banner-button" type="button" id="banner-dismiss">Got it</button>
+  </div>
+
+  <div class="admin__toolbar">
+    <button class="admin__tab admin__tab--active" type="button" data-view="upcoming">Upcoming</button>
+    <button class="admin__tab" type="button" data-view="history">History</button>
+    <input class="admin__search" type="search" id="search" placeholder="Search name, phone or service" aria-label="Search bookings" hidden>
+  </div>
+
+  <main class="admin__content" id="bookings"></main>
+
+  <script src="../assets/js/admin.js"></script>
+</body>
+</html>

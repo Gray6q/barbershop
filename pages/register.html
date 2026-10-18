@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create account – Your Barbershop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="page">
+
+  <div class="page__stripe"></div>
+
+  <header class="header">
+    <div class="header__inner">
+      <a class="header__logo" href="../index.html">Your <span class="header__logo-accent">Barbershop</span></a>
+      <button class="header__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+      </button>
+      <nav class="header__nav" id="menu">
+        <a class="header__link" href="../index.html#services">Services</a>
+        <a class="header__link" href="../index.html#why-us">Why us</a>
+        <a class="header__link" href="../index.html#hours">Hours</a>
+        <a class="header__link" href="../index.html#contact">Contact</a>
+        <a class="header__link" href="login.html">Log in</a>
+        <a class="btn btn--primary header__button" href="booking.html">Book now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="auth">
+    <div class="auth__inner">
+      <h1 class="auth__title">Create account</h1>
+      <p class="auth__text">Save your details and manage your bookings in one place.</p>
+
+      <form class="form" data-auth="register" novalidate>
+        <div class="form__field">
+          <label class="form__label" for="name">Name</label>
+          <input class="form__input" type="text" id="name" name="name" autocomplete="name" placeholder="Your name">
+          <p class="form__error" data-error="name"></p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="email">Email</label>
+          <input class="form__input" type="email" id="email" name="email" autocomplete="email" placeholder="you@example.com">
+          <p class="form__error" data-error="email"></p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="phone">Phone</label>
+          <input class="form__input" type="tel" id="phone" name="phone" autocomplete="tel" placeholder="+373 ...">
+          <p class="form__error" data-error="phone"></p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="password">Password (min. 8 characters)</label>
+          <input class="form__input" type="password" id="password" name="password" autocomplete="new-password">
+          <p class="form__error" data-error="password"></p>
+        </div>
+
+        <div class="form__field">
+          <label class="form__label" for="confirm">Repeat password</label>
+          <input class="form__input" type="password" id="confirm" name="confirm" autocomplete="new-password">
+          <p class="form__error" data-error="confirm"></p>
+        </div>
+
+        <button class="btn btn--primary form__submit" type="submit">Create account</button>
+        <p class="form__message" id="form-message" role="status"></p>
+      </form>
+
+      <p class="auth__switch">Already have an account? <a class="auth__link" href="login.html">Log in</a></p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <span>© Your Barbershop</span>
+      <span>[INSTAGRAM] · [FACEBOOK]</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/header.js"></script>
+  <script src="../assets/js/auth.js"></script>
+</body>
+</html>

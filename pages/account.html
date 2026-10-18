@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My account – Your Barbershop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="page">
+
+  <div class="page__stripe"></div>
+
+  <header class="header">
+    <div class="header__inner">
+      <a class="header__logo" href="../index.html">Your <span class="header__logo-accent">Barbershop</span></a>
+      <button class="header__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="menu">
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+        <span class="header__toggle-bar"></span>
+      </button>
+      <nav class="header__nav" id="menu">
+        <a class="header__link" href="../index.html#services">Services</a>
+        <a class="header__link" href="../index.html#why-us">Why us</a>
+        <a class="header__link" href="../index.html#hours">Hours</a>
+        <a class="header__link" href="../index.html#contact">Contact</a>
+        <a class="header__link" href="account.html">Account</a>
+        <a class="btn btn--primary header__button" href="booking.html">Book now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="account">
+    <div class="account__inner">
+      <h1 class="account__title">My account</h1>
+
+      <div class="account__details" data-account hidden>
+        <section class="account__section">
+          <h2 class="account__heading">Upcoming bookings</h2>
+          <div id="upcoming-list"></div>
+        </section>
+
+        <ul class="account__list">
+          <li class="account__item"><span class="account__label">Name</span><span class="account__value" data-field="name"></span></li>
+          <li class="account__item"><span class="account__label">Email</span><span class="account__value" data-field="email"></span></li>
+          <li class="account__item"><span class="account__label">Phone</span><span class="account__value" data-field="phone"></span></li>
+        </ul>
+        <button class="btn btn--outline account__logout" type="button" id="logout">Log out</button>
+
+        <section class="account__section account__section--history">
+          <h2 class="account__heading">Booking history</h2>
+          <div id="history-list"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer__inner">
+      <span>© Your Barbershop</span>
+      <span>[INSTAGRAM] · [FACEBOOK]</span>
+    </div>
+  </footer>
+
+  <script src="../assets/js/common.js"></script>
+  <script src="../assets/js/header.js"></script>
+  <script src="../assets/js/account.js"></script>
+</body>
+</html>

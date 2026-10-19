@@ -37,9 +37,15 @@ function loadMyBookings() {
   if (!upcomingEl || !historyEl) return;
 
   var UPCOMING_LABELS = { pending: 'Waiting for confirmation', confirmed: 'Confirmed' };
-  var HISTORY_LABELS = { pending: 'Not confirmed', confirmed: 'Completed', cancelled: 'Cancelled' };
+  var HISTORY_LABELS = {
+    pending: 'Not confirmed',
+    confirmed: 'Confirmed',
+    completed: 'Completed',
+    no_show: 'Missed',
+    cancelled: 'Cancelled'
+  };
 
-  function visitNode(booking, labels) {
+  function visitNode(booking, labels, cancellable) {
     var node = document.createElement('article');
     node.className = 'visit visit--' + booking.status;
 
@@ -63,10 +69,35 @@ function loadMyBookings() {
     node.appendChild(when);
     node.appendChild(status);
     node.appendChild(service);
+
+    if (cancellable && booking.canCancel) {
+      var actions = document.createElement('div');
+      actions.className = 'visit__actions';
+
+      var cancel = document.createElement('button');
+      cancel.type = 'button';
+      cancel.className = 'btn btn--danger btn--small visit__button';
+      cancel.textContent = 'Cancel booking';
+      cancel.addEventListener('click', function () {
+        if (!window.confirm('Cancel your booking on ' + day + ' at ' + booking.time + '?')) return;
+
+        cancel.disabled = true;
+        apiRequest('POST', '/api/my/bookings/' + booking.id + '/cancel')
+          .then(loadMyBookings)
+          .catch(function (error) {
+            cancel.disabled = false;
+            window.alert(error.userMessage || 'Could not cancel. Please call us.');
+          });
+      });
+
+      actions.appendChild(cancel);
+      node.appendChild(actions);
+    }
+
     return node;
   }
 
-  function fill(container, items, labels, emptyText, withLink) {
+  function fill(container, items, labels, emptyText, withLink, cancellable) {
     container.innerHTML = '';
 
     if (!items.length) {
@@ -87,14 +118,22 @@ function loadMyBookings() {
     }
 
     items.forEach(function (booking) {
-      container.appendChild(visitNode(booking, labels));
+      container.appendChild(visitNode(booking, labels, cancellable));
     });
   }
 
   apiRequest('GET', '/api/my/bookings')
     .then(function (data) {
-      fill(upcomingEl, data.upcoming, UPCOMING_LABELS, 'No upcoming bookings.', true);
-      fill(historyEl, data.history, HISTORY_LABELS, 'No visits yet.', false);
+      fill(upcomingEl, data.upcoming, UPCOMING_LABELS, 'No upcoming bookings.', true, true);
+      fill(historyEl, data.history, HISTORY_LABELS, 'No visits yet.', false, false);
+
+      if (data.upcoming.length) {
+        var note = document.createElement('p');
+        note.className = 'account__note';
+        note.textContent = 'You can cancel online up to ' + data.cancelHours +
+          ' hours before. Closer than that, please call us.';
+        upcomingEl.appendChild(note);
+      }
     })
     .catch(function () {
       upcomingEl.textContent = 'Could not load your bookings.';

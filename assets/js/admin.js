@@ -1,8 +1,8 @@
 (function () {
   var TIMEZONE = 'Europe/Chisinau';
   var SAFETY_POLL_MS = 60000;
-  var UPCOMING_LABELS = { pending: 'Waiting', confirmed: 'Confirmed', cancelled: 'Cancelled' };
-  var HISTORY_LABELS = { pending: 'Not confirmed', confirmed: 'Completed', cancelled: 'Cancelled' };
+  var LABELS = { pending: 'Waiting', confirmed: 'Confirmed', completed: 'Completed', no_show: 'No-show', cancelled: 'Cancelled' };
+  var DAYS = [['1', 'Monday'], ['2', 'Tuesday'], ['3', 'Wednesday'], ['4', 'Thursday'], ['5', 'Friday'], ['6', 'Saturday'], ['0', 'Sunday']];
 
   var listEl = document.getElementById('bookings');
   var bannerEl = document.getElementById('banner');
@@ -14,6 +14,8 @@
 
   var view = 'upcoming';
   var upcomingData = null;
+  var configData = null;
+  var settingsData = null;
   var knownIds = null;      // ids already seen (null until the first load)
   var unseenIds = {};       // new bookings nobody acknowledged yet
   var history = { items: [], hasMore: false, query: '', loading: false };
@@ -43,6 +45,41 @@
     node.type = 'button';
     node.addEventListener('click', onClick);
     return node;
+  }
+
+  function control(tag, className, attrs) {
+    var node = document.createElement(tag);
+    node.className = className || '';
+    Object.keys(attrs || {}).forEach(function (key) {
+      node.setAttribute(key, attrs[key]);
+    });
+    return node;
+  }
+
+  function field(label, node) {
+    var wrap = el('div', 'form__field');
+    wrap.appendChild(el('label', 'form__label', label));
+    wrap.appendChild(node);
+    return wrap;
+  }
+
+  function checkbox(label, checked) {
+    var wrap = el('label', 'admin__check');
+    var box = control('input', '', { type: 'checkbox' });
+    box.checked = checked;
+    wrap.appendChild(box);
+    wrap.appendChild(document.createTextNode(label));
+    return { wrap: wrap, box: box };
+  }
+
+  function setOptions(select, options) {
+    select.innerHTML = '';
+    options.forEach(function (item) {
+      var option = document.createElement('option');
+      option.value = item[0];
+      option.textContent = item[1];
+      select.appendChild(option);
+    });
   }
 
   function pad(number) {
@@ -95,6 +132,17 @@
     liveEl.classList.toggle('admin__live--error', connectionLost || !streamOpen);
   }
 
+  function clearMessage(node) {
+    node.textContent = '';
+    node.className = 'form__message';
+  }
+
+  function showFormError(node, error) {
+    if (error.message === 'redirect') return;
+    node.textContent = error.message === 'forbidden' ? 'No access.' : error.message;
+    node.classList.add('form__message--error');
+  }
+
   /* ---------- Sound ---------- */
   function beep() {
     if (!soundOn || !audioContext) return;
@@ -143,7 +191,7 @@
       if (response.status === 403) throw new Error('forbidden');
 
       return response.json().catch(function () { return {}; }).then(function (data) {
-        if (!response.ok) throw new Error(data.error || 'server');
+        if (!response.ok) throw new Error(data.error || 'Something went wrong.');
         return data;
       });
     });
@@ -167,9 +215,28 @@
     updateLive();
   }
 
-  /* ---------- Cards ---------- */
+  function withConfig(done) {
+    if (configData) { done(); return; }
+    request('GET', '/api/config')
+      .then(function (data) { configData = data; done(); })
+      .catch(handleError);
+  }
+
+  function withSettings(done) {
+    if (settingsData) { done(); return; }
+    request('GET', '/api/admin/settings')
+      .then(function (data) { settingsData = data; done(); })
+      .catch(handleError);
+  }
+
+  /* ---------- Booking cards ---------- */
+  function hasStarted(booking) {
+    if (!upcomingData) return false;
+    return booking.date < upcomingData.today ||
+      (booking.date === upcomingData.today && toMinutes(booking.time) <= upcomingData.nowMinutes);
+  }
+
   function card(booking, mode) {
-    var labels = mode === 'history' ? HISTORY_LABELS : UPCOMING_LABELS;
     var isNew = mode === 'upcoming' && Boolean(unseenIds[booking.id]);
     var node = el('article', 'booking-card booking-card--' + booking.status + (isNew ? ' booking-card--new' : ''));
 
@@ -177,40 +244,60 @@
     time.appendChild(el('span', 'booking-card__until', 'until ' + toTime(toMinutes(booking.time) + booking.duration)));
     node.appendChild(time);
 
+    var label = (mode === 'history' && booking.status === 'pending') ? 'Not confirmed' : (LABELS[booking.status] || booking.status);
     var main = el('div', 'booking-card__main');
     var service = el('div', 'booking-card__service', booking.service);
-    service.appendChild(el('span', 'booking-card__badge', labels[booking.status] || booking.status));
+    service.appendChild(el('span', 'booking-card__badge', label));
     main.appendChild(service);
 
-    var client = el('div', 'booking-card__client', booking.name + ' · ');
-    var phone = el('a', 'booking-card__phone', booking.phone);
-    phone.href = 'tel:' + booking.phone.replace(/[^0-9+]/g, '');
-    client.appendChild(phone);
+    var client = el('div', 'booking-card__client', booking.name);
+    if (booking.phone && booking.phone !== '-') {
+      client.appendChild(document.createTextNode(' · '));
+      var phone = el('a', 'booking-card__phone', booking.phone);
+      phone.href = 'tel:' + booking.phone.replace(/[^0-9+]/g, '');
+      client.appendChild(phone);
+    }
     main.appendChild(client);
 
     if (booking.comment) {
       main.appendChild(el('div', 'booking-card__comment', '“' + booking.comment + '”'));
     }
 
-    var meta = 'Booked ' + formatStamp(booking.created_at);
+    var meta = 'Booked ' + formatStamp(booking.created_at) + (booking.source === 'manual' ? ' · added by hand' : '');
     if (booking.status_changed_at && booking.status !== 'pending') {
-      meta += ' · ' + booking.status + ' ' + formatStamp(booking.status_changed_at);
+      meta += ' · ' + (LABELS[booking.status] || booking.status).toLowerCase() + ' ' + formatStamp(booking.status_changed_at);
     }
     main.appendChild(el('div', 'booking-card__meta', meta));
     node.appendChild(main);
 
     var actions = el('div', 'booking-card__actions');
     if (mode === 'upcoming') {
-      if (booking.status === 'pending') {
+      var status = booking.status;
+      var active = status === 'pending' || status === 'confirmed';
+
+      if (status === 'pending') {
         actions.appendChild(button('Confirm', 'btn btn--primary btn--small booking-card__button', function () {
           setStatus(booking, 'confirmed');
         }));
       }
-      if (booking.status !== 'cancelled') {
+      if (active && hasStarted(booking)) {
+        actions.appendChild(button('Done', 'btn btn--primary btn--small booking-card__button', function () {
+          setStatus(booking, 'completed');
+        }));
+        actions.appendChild(button('No-show', 'btn btn--danger btn--small booking-card__button', function () {
+          setStatus(booking, 'no_show');
+        }));
+      }
+      if (active) {
         actions.appendChild(button('Cancel', 'btn btn--danger btn--small booking-card__button', function () {
           if (window.confirm('Cancel the booking of ' + booking.name + ' at ' + booking.time + '?')) {
             setStatus(booking, 'cancelled');
           }
+        }));
+      }
+      if (status === 'completed' || status === 'no_show') {
+        actions.appendChild(button('Undo', 'btn btn--outline btn--small booking-card__button', function () {
+          setStatus(booking, 'confirmed');
         }));
       }
     }
@@ -219,7 +306,18 @@
     return node;
   }
 
-  /* ---------- Rendering ---------- */
+  function setStatus(booking, status) {
+    delete unseenIds[booking.id];
+
+    request('PATCH', '/api/admin/bookings/' + booking.id, { status: status })
+      .then(loadUpcoming)
+      .catch(function (error) {
+        if (error.message === 'redirect') return;
+        window.alert(error.message === 'forbidden' ? 'No access.' : error.message);
+      });
+  }
+
+  /* ---------- Views ---------- */
   function renderList(bookings, today, mode) {
     var currentDate = null;
     bookings.forEach(function (booking) {
@@ -243,7 +341,7 @@
 
   function renderHistory() {
     if (!history.items.length && !history.loading) {
-      listEl.appendChild(el('p', 'admin__empty', history.query ? 'Nothing found.' : 'No past bookings yet.'));
+      listEl.appendChild(el('p', 'admin__empty', history.query ? 'Nothing found.' : 'No bookings from past days yet.'));
       return;
     }
 
@@ -258,11 +356,341 @@
     }
   }
 
+  /* ----- New booking (added by hand) ----- */
+  function renderNew() {
+    if (!configData) {
+      listEl.appendChild(el('p', 'admin__empty', 'Loading...'));
+      return;
+    }
+
+    var form = el('form', 'admin__panel');
+    form.noValidate = true;
+
+    var name = control('input', 'form__input', { type: 'text', maxlength: '80', autocomplete: 'off' });
+    var phone = control('input', 'form__input', { type: 'tel', autocomplete: 'off', placeholder: 'Optional' });
+    var service = control('select', 'form__input');
+    var date = control('input', 'form__input', { type: 'date' });
+    var time = control('select', 'form__input');
+    var comment = control('textarea', 'form__input form__input--textarea', { rows: '2', maxlength: '300' });
+    var message = el('p', 'form__message');
+    var lastRequest = 0;
+
+    if (upcomingData) date.min = upcomingData.today;
+
+    setOptions(service, [['', 'Choose a service']].concat(configData.services.map(function (item) {
+      return [item.name, item.name + ' · ' + item.duration + ' min'];
+    })));
+    setOptions(time, [['', 'Choose a service and a date first']]);
+    time.disabled = true;
+
+    function loadTimes() {
+      if (!date.value || !service.value) {
+        setOptions(time, [['', 'Choose a service and a date first']]);
+        time.disabled = true;
+        return;
+      }
+
+      var id = ++lastRequest;
+      setOptions(time, [['', 'Loading...']]);
+      time.disabled = true;
+
+      request('GET', '/api/availability?date=' + encodeURIComponent(date.value) +
+                     '&service=' + encodeURIComponent(service.value))
+        .then(function (data) {
+          if (id !== lastRequest) return;
+          if (!data.times.length) {
+            setOptions(time, [['', 'No free times on this day']]);
+            return;
+          }
+          setOptions(time, [['', 'Choose a time']].concat(data.times.map(function (t) { return [t, t]; })));
+          time.disabled = false;
+        })
+        .catch(function () {
+          if (id === lastRequest) setOptions(time, [['', 'Could not load times']]);
+        });
+    }
+
+    service.addEventListener('change', loadTimes);
+    date.addEventListener('change', loadTimes);
+
+    var row = el('div', 'form__row');
+    row.appendChild(field('Date', date));
+    row.appendChild(field('Time', time));
+
+    form.appendChild(field('Client name', name));
+    form.appendChild(field('Phone', phone));
+    form.appendChild(field('Service', service));
+    form.appendChild(row);
+    form.appendChild(field('Comment (optional)', comment));
+    form.appendChild(button('Add booking', 'btn btn--primary form__submit', function () {
+      form.requestSubmit();
+    }));
+    form.appendChild(message);
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      clearMessage(message);
+
+      request('POST', '/api/admin/bookings', {
+        name: name.value, phone: phone.value, service: service.value,
+        date: date.value, time: time.value, comment: comment.value
+      })
+        .then(function () {
+          return loadUpcoming();
+        })
+        .then(function () {
+          setView('upcoming');
+        })
+        .catch(function (error) {
+          showFormError(message, error);
+          if (date.value && service.value) loadTimes();
+        });
+    });
+
+    listEl.appendChild(form);
+  }
+
+  /* ----- Time off ----- */
+  function blockRow(block, reload) {
+    var row = el('div', 'admin__block');
+    var text = dayLabel(block.date, upcomingData ? upcomingData.today : null) + ' · ' +
+      (block.start_time ? block.start_time + ' – ' + block.end_time : 'Whole day') +
+      (block.reason ? ' · ' + block.reason : '');
+
+    row.appendChild(el('span', 'admin__block-text', text));
+    row.appendChild(button('Remove', 'btn btn--outline btn--small', function () {
+      request('DELETE', '/api/admin/blocks/' + block.id)
+        .then(reload)
+        .catch(function (error) {
+          if (error.message !== 'redirect') window.alert(error.message);
+        });
+    }));
+    return row;
+  }
+
+  function renderBlocks() {
+    var form = el('form', 'admin__panel');
+    form.noValidate = true;
+
+    var from = control('input', 'form__input', { type: 'date' });
+    var to = control('input', 'form__input', { type: 'date' });
+    var start = control('input', 'form__input', { type: 'time' });
+    var end = control('input', 'form__input', { type: 'time' });
+    var reason = control('input', 'form__input', { type: 'text', maxlength: '100', placeholder: 'Optional, for example: vacation' });
+    var whole = checkbox(' Whole day (or several days)', true);
+    var message = el('p', 'form__message');
+    var listBox = el('div');
+
+    if (upcomingData) {
+      from.min = upcomingData.today;
+      to.min = upcomingData.today;
+    }
+
+    var datesRow = el('div', 'form__row');
+    datesRow.appendChild(field('First day', from));
+    datesRow.appendChild(field('Last day (optional)', to));
+
+    var timesRow = el('div', 'form__row');
+    timesRow.appendChild(field('From', start));
+    timesRow.appendChild(field('To', end));
+    timesRow.hidden = true;
+
+    whole.box.addEventListener('change', function () {
+      timesRow.hidden = whole.box.checked;
+      to.disabled = !whole.box.checked;
+    });
+
+    form.appendChild(el('h2', 'admin__heading', 'Block time off'));
+    form.appendChild(datesRow);
+    form.appendChild(whole.wrap);
+    form.appendChild(timesRow);
+    form.appendChild(field('Reason', reason));
+    form.appendChild(button('Block', 'btn btn--primary form__submit', function () {
+      form.requestSubmit();
+    }));
+    form.appendChild(message);
+
+    function loadBlocks() {
+      request('GET', '/api/admin/blocks')
+        .then(function (data) {
+          listBox.innerHTML = '';
+          if (!data.blocks.length) {
+            listBox.appendChild(el('p', 'admin__empty', 'Nothing planned.'));
+            return;
+          }
+          data.blocks.forEach(function (block) {
+            listBox.appendChild(blockRow(block, loadBlocks));
+          });
+        })
+        .catch(handleError);
+    }
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      clearMessage(message);
+
+      var body = { date: from.value, reason: reason.value };
+      if (whole.box.checked) {
+        if (to.value) body.dateTo = to.value;
+      } else {
+        body.startTime = start.value;
+        body.endTime = end.value;
+      }
+
+      request('POST', '/api/admin/blocks', body)
+        .then(function (data) {
+          message.textContent = 'Blocked.';
+          if (data.conflicts.length) {
+            window.alert('These bookings are already inside the blocked time. Cancel or move them:\n\n' +
+              data.conflicts.map(function (c) {
+                return c.date + ' ' + c.time + ' · ' + c.name + ' · ' + c.service;
+              }).join('\n'));
+          }
+          loadBlocks();
+        })
+        .catch(function (error) {
+          showFormError(message, error);
+        });
+    });
+
+    listEl.appendChild(form);
+    listEl.appendChild(el('h2', 'admin__day-title', 'Planned time off'));
+    listEl.appendChild(listBox);
+    loadBlocks();
+  }
+
+  /* ----- Settings: opening hours and services ----- */
+  function renderSettings() {
+    if (!settingsData) {
+      listEl.appendChild(el('p', 'admin__empty', 'Loading...'));
+      return;
+    }
+
+    var form = el('form', 'admin__panel');
+    form.noValidate = true;
+    var message = el('p', 'form__message');
+    var hoursRows = {};
+    var servicesBox = el('div');
+
+    form.appendChild(el('h2', 'admin__heading', 'Opening hours'));
+    form.appendChild(el('p', 'admin__hint', 'Times are Chisinau time.'));
+
+    DAYS.forEach(function (day) {
+      var value = settingsData.hours[day[0]];
+      var row = el('div', 'admin__hours-row');
+      var closed = checkbox(' Closed', !value);
+      var open = control('input', 'form__input', { type: 'time' });
+      var close = control('input', 'form__input', { type: 'time' });
+
+      open.value = value ? value[0] : '09:00';
+      close.value = value ? value[1] : '18:00';
+
+      function sync() {
+        open.disabled = closed.box.checked;
+        close.disabled = closed.box.checked;
+      }
+      closed.box.addEventListener('change', sync);
+      sync();
+
+      row.appendChild(el('span', 'admin__hours-day', day[1]));
+      row.appendChild(closed.wrap);
+      row.appendChild(open);
+      row.appendChild(close);
+      form.appendChild(row);
+
+      hoursRows[day[0]] = { closed: closed.box, open: open, close: close };
+    });
+
+    form.appendChild(el('h2', 'admin__heading', 'Services and prices'));
+    form.appendChild(el('p', 'admin__hint', 'Changes appear on the website right after you save. Existing bookings are not changed.'));
+
+    function serviceRow(service) {
+      var row = el('div', 'admin__service');
+      var name = control('input', 'form__input', { type: 'text', maxlength: '60' });
+      var duration = control('input', 'form__input', { type: 'number', min: '10', max: '480', step: '5' });
+      var price = control('input', 'form__input', { type: 'number', min: '0', step: '1' });
+      var description = control('input', 'form__input', { type: 'text', maxlength: '200' });
+      var featured = checkbox(' Most popular', Boolean(service.featured));
+
+      name.value = service.name;
+      duration.value = service.duration;
+      price.value = service.price;
+      description.value = service.description || '';
+
+      row.appendChild(field('Name', name));
+      row.appendChild(field('Minutes', duration));
+      row.appendChild(field('Price (MDL)', price));
+      row.appendChild(field('Description', description));
+      row.appendChild(featured.wrap);
+      row.appendChild(button('Remove', 'btn btn--danger btn--small', function () {
+        row.remove();
+      }));
+
+      row.readValues = function () {
+        return {
+          name: name.value,
+          duration: Number(duration.value),
+          price: Number(price.value),
+          description: description.value,
+          featured: featured.box.checked
+        };
+      };
+      return row;
+    }
+
+    settingsData.services.forEach(function (service) {
+      servicesBox.appendChild(serviceRow(service));
+    });
+    form.appendChild(servicesBox);
+
+    var actions = el('div', 'admin__service-actions');
+    actions.appendChild(button('+ Add service', 'btn btn--outline btn--small', function () {
+      servicesBox.appendChild(serviceRow({ name: '', duration: 30, price: 0, description: '', featured: false }));
+    }));
+    form.appendChild(actions);
+
+    form.appendChild(button('Save changes', 'btn btn--primary form__submit', function () {
+      form.requestSubmit();
+    }));
+    form.appendChild(message);
+
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      clearMessage(message);
+
+      var hours = {};
+      Object.keys(hoursRows).forEach(function (key) {
+        var r = hoursRows[key];
+        hours[key] = r.closed.checked ? null : [r.open.value, r.close.value];
+      });
+
+      var services = Array.prototype.map.call(servicesBox.children, function (row) {
+        return row.readValues();
+      });
+
+      request('PUT', '/api/admin/settings', { hours: hours, services: services })
+        .then(function (data) {
+          settingsData = data;
+          configData = null;
+          message.textContent = 'Saved. The website is updated.';
+        })
+        .catch(function (error) {
+          showFormError(message, error);
+        });
+    });
+
+    listEl.appendChild(form);
+  }
+
   function render() {
     if (noAccess) return;
     listEl.innerHTML = '';
+
     if (view === 'upcoming') renderUpcoming();
-    else renderHistory();
+    else if (view === 'history') renderHistory();
+    else if (view === 'new') renderNew();
+    else if (view === 'blocks') renderBlocks();
+    else if (view === 'settings') renderSettings();
   }
 
   function setView(next) {
@@ -277,7 +705,20 @@
       loadHistory(true);
       return;
     }
+
     render();
+
+    if (next === 'new' && !configData) {
+      withConfig(function () { if (view === 'new') render(); });
+    }
+    if (next === 'settings' && !settingsData) {
+      withSettings(function () { if (view === 'settings') render(); });
+    }
+    // the form may need fresh service names after settings were saved
+    if (next === 'settings' && settingsData) {
+      settingsData = null;
+      withSettings(function () { if (view === 'settings') render(); });
+    }
   }
 
   tabs.forEach(function (tab) {
@@ -294,7 +735,13 @@
     }, 300);
   });
 
-  /* ---------- New booking alert ---------- */
+  /* ---------- Alerts ---------- */
+  function showNotice(text) {
+    bannerText.textContent = text;
+    bannerEl.classList.add('admin__banner--visible');
+    beep();
+  }
+
   function showBanner(lastBooking) {
     var count = Object.keys(unseenIds).length;
     bannerText.textContent = count === 1
@@ -312,7 +759,7 @@
     bookings.forEach(function (booking) {
       if (!knownIds[booking.id]) {
         knownIds[booking.id] = true;
-        if (!first && booking.status === 'pending') fresh.push(booking);
+        if (!first && booking.status === 'pending' && booking.source !== 'manual') fresh.push(booking);
       }
     });
 
@@ -375,17 +822,6 @@
       });
   }
 
-  function setStatus(booking, status) {
-    delete unseenIds[booking.id];
-
-    request('PATCH', '/api/admin/bookings/' + booking.id, { status: status })
-      .then(loadUpcoming)
-      .catch(function (error) {
-        if (error.message === 'redirect') return;
-        window.alert(error.message === 'forbidden' ? 'No access.' : error.message);
-      });
-  }
-
   /* ---------- Instant notifications ---------- */
   function connectStream() {
     if (!window.EventSource) return;
@@ -393,6 +829,14 @@
     source = new EventSource('/api/admin/stream');
 
     source.addEventListener('booking', function () {
+      loadUpcoming();
+    });
+
+    source.addEventListener('cancelled', function (event) {
+      var info = {};
+      try { info = JSON.parse(event.data); } catch (error) {}
+      showNotice('Cancelled by the client: ' + (info.date || '') + ' ' + (info.time || '') +
+        ' · ' + (info.service || '') + ' · ' + (info.name || ''));
       loadUpcoming();
     });
 

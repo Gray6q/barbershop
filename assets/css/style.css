@@ -1164,3 +1164,339 @@ a {
     flex: 1;
   }
 }
+
+/* ===== Hidden elements ===== */
+[hidden] {
+  display: none !important;
+}
+
+/* ===== Admin: forms and panels ===== */
+.admin__panel {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #4a443b;
+  background-color: #1e1b17;
+}
+
+.admin__heading {
+  margin: 8px 0 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.admin__hint {
+  margin-bottom: 16px;
+  font-size: 15px;
+  color: #b3a998;
+}
+
+.admin__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.admin__hours-row {
+  display: grid;
+  grid-template-columns: 130px auto 1fr 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #4a443b;
+}
+
+.admin__hours-day {
+  font-weight: 500;
+}
+
+.admin__service {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  align-items: end;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #4a443b;
+}
+
+.admin__service-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.admin__block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #4a443b;
+}
+
+@media (max-width: 768px) {
+  .admin__panel {
+    padding: 16px;
+  }
+
+  .admin__hours-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin__hours-day {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ===== Booking statuses ===== */
+.booking-card--completed {
+  border-left: 6px solid #7fd195;
+  opacity: 0.8;
+}
+
+.booking-card--no_show {
+  border-left: 6px solid #ec8a7f;
+  opacity: 0.8;
+}
+
+.visit--completed {
+  border-left-color: #7fd195;
+}
+
+.visit--no_show {
+  border-left-color: #ec8a7f;
+  opacity: 0.7;
+}
+
+.visit__actions {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+.visit__button {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.account__note {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #b3a998;
+}
+
+/* ===== Privacy and 404 pages ===== */
+.legal__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 32px 96px;
+}
+
+.legal__title {
+  margin-bottom: 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: clamp(40px, 7vw, 56px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.legal__heading {
+  margin: 32px 0 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  text-transform: uppercase;
+}
+
+.legal__text {
+  margin-bottom: 16px;
+  color: #b3a998;
+}
+
+.footer__link {
+  text-decoration: underline;
+}
+
+.footer__link:hover {
+  color: #c9974a;
+}
+
+@media (max-width: 768px) {
+  .legal__inner {
+    padding: 32px 20px 64px;
+  }
+}
+
+/* ===== Hidden elements ===== */
+[hidden] {
+  display: none !important;
+}
+
+/* ===== Admin: forms and panels ===== */
+.admin__panel {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid #4a443b;
+  background-color: #1e1b17;
+}
+
+.admin__heading {
+  margin: 8px 0 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.admin__hint {
+  margin-bottom: 16px;
+  font-size: 15px;
+  color: #b3a998;
+}
+
+.admin__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.admin__hours-row {
+  display: grid;
+  grid-template-columns: 130px auto 1fr 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #4a443b;
+}
+
+.admin__hours-day {
+  font-weight: 500;
+}
+
+.admin__service {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  align-items: end;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid #4a443b;
+}
+
+.admin__service-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.admin__block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #4a443b;
+}
+
+@media (max-width: 768px) {
+  .admin__panel {
+    padding: 16px;
+  }
+
+  .admin__hours-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin__hours-day {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ===== Booking statuses ===== */
+.booking-card--completed {
+  border-left: 6px solid #7fd195;
+  opacity: 0.8;
+}
+
+.booking-card--no_show {
+  border-left: 6px solid #ec8a7f;
+  opacity: 0.8;
+}
+
+.visit--completed {
+  border-left-color: #7fd195;
+}
+
+.visit--no_show {
+  border-left-color: #ec8a7f;
+  opacity: 0.7;
+}
+
+.visit__actions {
+  grid-column: 1 / -1;
+  margin-top: 8px;
+}
+
+.visit__button {
+  font-family: 'Barlow', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.account__note {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #b3a998;
+}
+
+/* ===== Privacy and 404 pages ===== */
+.legal__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 32px 96px;
+}
+
+.legal__title {
+  margin-bottom: 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: clamp(40px, 7vw, 56px);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.legal__heading {
+  margin: 32px 0 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 26px;
+  text-transform: uppercase;
+}
+
+.legal__text {
+  margin-bottom: 16px;
+  color: #b3a998;
+}
+
+.footer__link {
+  text-decoration: underline;
+}
+
+.footer__link:hover {
+  color: #c9974a;
+}
+
+@media (max-width: 768px) {
+  .legal__inner {
+    padding: 32px 20px 64px;
+  }
+}
